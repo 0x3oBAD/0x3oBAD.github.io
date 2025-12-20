@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background -->
+  <rect width="32" height="32" fill="#0a0a0a" rx="4"/>
+  
+  <!-- Hex symbol "0x" in green terminal style -->
+  <text x="16" y="21" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#00ff41" text-anchor="middle">0x</text>
+</svg>
+
