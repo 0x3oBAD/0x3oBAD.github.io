@@ -216,6 +216,8 @@ exclude:
   - "*.config.js"
   - "package*.json"
 
+# Feed generation is disabled via plugin
+
 jekyll-archives:
   enabled: [categories, tags]
   layouts:
