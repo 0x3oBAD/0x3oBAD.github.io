@@ -44,7 +44,7 @@ After examining that offset here we go , we have some **NOPs** and valid opcode 
 *0x6B52 physical offset dump*
 
 The next step I will disassemble the bytes there making sure to have valid opcodes
-![](/assets/cloud-atlas/shellcode_start.PNG)
+![](/assets/cloud-atlas/shellcode_start.png)
 *Shellcode start*
 
 Here we have the start of the **shellcode** and **PIC** instructions as well and it seems to be decrypted!
