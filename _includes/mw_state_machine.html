@@ -1,0 +1,314 @@
+
+<style>
+  :root { --phase0:#EEEDFE; --phase0s:#534AB7; --phase0t:#3C3489;
+          --phase1:#E1F5EE; --phase1s:#0F6E56; --phase1t:#085041;
+          --phase2:#FAEEDA; --phase2s:#854F0B; --phase2t:#633806;
+          --phase3:#E6F1FB; --phase3s:#185FA5; --phase3t:#0C447C;
+          --phase4:#FAECE7; --phase4s:#993C1D; --phase4t:#712B13;
+          --phase5:#EAF3DE; --phase5s:#3B6D11; --phase5t:#27500A;
+          --phase6:#FCEBEB; --phase6s:#A32D2D; --phase6t:#791F1F; }
+  body,html { margin:0; padding:0; }
+  #wrap { padding:16px 0 24px; font-family: var(--font-sans, sans-serif); }
+  #legend { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .leg { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--color-text-secondary); }
+  .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  #filter-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .fbtn { font-size:11px; padding:3px 10px; border-radius:12px; border:0.5px solid var(--color-border-secondary); background:var(--color-background-secondary); color:var(--color-text-secondary); cursor:pointer; transition:all .15s; }
+  .fbtn.active, .fbtn:hover { color:var(--color-text-primary); border-color:var(--color-border-primary); background:var(--color-background-primary); }
+  svg { display:block; width:100%; overflow:visible; }
+  .node-g { cursor:pointer; }
+  .node-g rect { transition: filter .15s; }
+  .node-g:hover rect { filter: brightness(0.94); }
+  .node-g.dimmed { opacity:0.18; }
+  .node-g.highlighted rect { stroke-width:1.8 !important; }
+  .edge { transition: opacity .2s; }
+  .edge.dimmed { opacity:0.06; }
+  #detail { margin-top:14px; background:var(--color-background-secondary); border:0.5px solid var(--color-border-tertiary); border-radius:8px; padding:12px 14px; font-size:13px; color:var(--color-text-secondary); min-height:44px; }
+  #detail strong { color:var(--color-text-primary); font-weight:500; }
+  #detail code { font-family:var(--font-mono,monospace); font-size:12px; background:var(--color-background-tertiary); padding:1px 4px; border-radius:3px; }
+</style>
+<div id="wrap">
+  <div id="legend">
+    <div class="leg"><div class="dot" style="background:#7F77DD"></div>Init</div>
+    <div class="leg"><div class="dot" style="background:#1D9E75"></div>PEB walk / API resolve</div>
+    <div class="leg"><div class="dot" style="background:#BA7517"></div>PE validation</div>
+    <div class="leg"><div class="dot" style="background:#378ADD"></div>Memory alloc / copy</div>
+    <div class="leg"><div class="dot" style="background:#D85A30"></div>Relocations</div>
+    <div class="leg"><div class="dot" style="background:#639922"></div>Import resolution</div>
+    <div class="leg"><div class="dot" style="background:#E24B4A"></div>Entry point</div>
+  </div>
+  <div id="filter-bar">
+    <button class="fbtn active" data-phase="all">All phases</button>
+    <button class="fbtn" data-phase="0">Init</button>
+    <button class="fbtn" data-phase="1">PEB / API</button>
+    <button class="fbtn" data-phase="2">PE validate</button>
+    <button class="fbtn" data-phase="3">Alloc</button>
+    <button class="fbtn" data-phase="4">Relocs</button>
+    <button class="fbtn" data-phase="5">Imports</button>
+    <button class="fbtn" data-phase="6">Entry</button>
+  </div>
+  <svg id="sm" viewBox="0 0 880 1680">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+    <!-- NODES -->
+    <!-- Phase 0: Init -->
+    <g class="node-g" data-phase="0" data-id="INIT" data-info="&lt;strong&gt;mw_Init&lt;/strong&gt; — state = 0x4A5E3F49. Entry point of the state machine. All pointers zeroed, dispatch begins." onclick="selectNode(this)">
+      <rect x="330" y="14" width="220" height="46" rx="7" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/>
+      <text x="440" y="33" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">mw_Init</text>
+      <text x="440" y="50" text-anchor="middle" font-size="11" fill="#534AB7">state = 0x4A5E3F49</text>
+    </g>
+
+    <!-- Phase 1: PEB Walk -->
+    <g class="node-g" data-phase="1" data-id="WALK_PEB" data-info="&lt;strong&gt;mw_WalkPEB&lt;/strong&gt; — Calls &lt;code&gt;NtCurrentPeb()-&gt;Ldr&lt;/code&gt;, grabs InMemoryOrderModuleList. Starts walking loaded DLLs." onclick="selectNode(this)">
+      <rect x="290" y="102" width="300" height="46" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="121" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_WalkPEB</text>
+      <text x="440" y="138" text-anchor="middle" font-size="11" fill="#0F6E56">NtCurrentPeb()-&gt;Ldr, InMemoryOrderModuleList</text>
+    </g>
+
+    <g class="node-g" data-phase="1" data-id="NEXT_MODULE" data-info="&lt;strong&gt;mw_NextModule&lt;/strong&gt; — Advances module_list_entry via Flink. Loops through each loaded DLL until all are exhausted." onclick="selectNode(this)">
+      <rect x="290" y="192" width="300" height="46" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="211" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_NextModule</text>
+      <text x="440" y="228" text-anchor="middle" font-size="11" fill="#0F6E56">module_list_entry = Flink → next LDR entry</text>
+    </g>
+
+    <g class="node-g" data-phase="1" data-id="PARSE_EXPORTS" data-info="&lt;strong&gt;mw_ParseExports&lt;/strong&gt; — Locates export directory in current DLL. Sets name_rva_table, func_addr_table, ordinal_table pointers." onclick="selectNode(this)">
+      <rect x="270" y="282" width="340" height="46" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="301" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_ParseExports</text>
+      <text x="440" y="318" text-anchor="middle" font-size="11" fill="#0F6E56">export_dir, name_rva_table, ordinal_table</text>
+    </g>
+
+    <g class="node-g" data-phase="1" data-id="HASH_NAME" data-info="&lt;strong&gt;mw_HashExportName&lt;/strong&gt; — ROL-13 hash loop: &lt;code&gt;hash = ROL32(hash, 0x13) + *char&lt;/code&gt;. Iterates each char of export name until null terminator." onclick="selectNode(this)">
+      <rect x="270" y="372" width="340" height="46" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="391" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_HashExportName</text>
+      <text x="440" y="408" text-anchor="middle" font-size="11" fill="#0F6E56">ROL32(hash, 0x13) + *char — per-char loop</text>
+    </g>
+
+    <g class="node-g" data-phase="1" data-id="CMP_HASH" data-info="&lt;strong&gt;mw_CmpHash&lt;/strong&gt; — Compares computed_hash against 4 targets: &lt;code&gt;0xEC0E4E8E&lt;/code&gt; VirtualAlloc, &lt;code&gt;0x91AFCA54&lt;/code&gt; LoadLibraryA, &lt;code&gt;0x7946C61B&lt;/code&gt; GetProcAddress, &lt;code&gt;0x7C0DFCAA&lt;/code&gt; VirtualProtect." onclick="selectNode(this)">
+      <rect x="245" y="462" width="390" height="56" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="483" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_CmpHash</text>
+      <text x="440" y="500" text-anchor="middle" font-size="11" fill="#0F6E56">Match: 0xEC0E4E8E / 0x91AFCA54 / 0x7946C61B / 0x7C0DFCAA</text>
+      <text x="440" y="512" text-anchor="middle" font-size="10" fill="#0F6E56">VirtualAlloc / LoadLibraryA / GetProcAddress / VirtualProtect</text>
+    </g>
+
+    <!-- Hit / miss branches -->
+    <g class="node-g" data-phase="1" data-id="STORE_FN" data-info="&lt;strong&gt;mw_StoreResolvedFn&lt;/strong&gt; — Hash matched. Stores resolved function pointer: fn_VirtualAlloc, fn_LoadLibraryA, fn_GetProcAddress, or fn_VirtualProtect." onclick="selectNode(this)">
+      <rect x="530" y="462" width="240" height="56" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="650" y="483" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_StoreResolvedFn</text>
+      <text x="650" y="500" text-anchor="middle" font-size="11" fill="#0F6E56">fn_VirtualAlloc / fn_LoadLibraryA</text>
+      <text x="650" y="512" text-anchor="middle" font-size="10" fill="#0F6E56">fn_GetProcAddress / fn_VirtualProtect</text>
+    </g>
+
+    <g class="node-g" data-phase="1" data-id="ALL_FOUND" data-info="&lt;strong&gt;mw_CheckAllResolved&lt;/strong&gt; — Tests all 4 function pointers non-null. Only proceeds to PE validation once every API is resolved." onclick="selectNode(this)">
+      <rect x="290" y="564" width="300" height="46" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+      <text x="440" y="583" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">mw_CheckAllResolved</text>
+      <text x="440" y="600" text-anchor="middle" font-size="11" fill="#0F6E56">fn_VirtualAlloc &amp;&amp; LoadLib &amp;&amp; GPA &amp;&amp; VP ?</text>
+    </g>
+
+    <!-- Phase 2: PE Validation -->
+    <g class="node-g" data-phase="2" data-id="CHECK_MZ" data-info="&lt;strong&gt;mw_CheckMZ&lt;/strong&gt; — Reads WORD at target base. Checks for MZ magic (0x5A4D). Loops scanning forward if not found." onclick="selectNode(this)">
+      <rect x="290" y="654" width="300" height="46" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+      <text x="440" y="673" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">mw_CheckMZ</text>
+      <text x="440" y="690" text-anchor="middle" font-size="11" fill="#854F0B">*(WORD*)base == 0x5A4D ?</text>
+    </g>
+
+    <g class="node-g" data-phase="2" data-id="CHECK_LFANEW" data-info="&lt;strong&gt;mw_CheckLfanew&lt;/strong&gt; — Reads e_lfanew from DOS header. Validates &gt;= 0x40 (minimum valid offset for NT headers)." onclick="selectNode(this)">
+      <rect x="290" y="744" width="300" height="46" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+      <text x="440" y="763" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">mw_CheckLfanew</text>
+      <text x="440" y="780" text-anchor="middle" font-size="11" fill="#854F0B">e_lfanew &gt;= 0x40 ?</text>
+    </g>
+
+    <g class="node-g" data-phase="2" data-id="CHECK_PE" data-info="&lt;strong&gt;mw_CheckPESig&lt;/strong&gt; — Reads DWORD at base+e_lfanew. Checks for PE signature 0x4550 ('PE\0\0')." onclick="selectNode(this)">
+      <rect x="290" y="834" width="300" height="46" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+      <text x="440" y="853" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">mw_CheckPESig</text>
+      <text x="440" y="870" text-anchor="middle" font-size="11" fill="#854F0B">*(DWORD*)(base+lfanew) == 0x4550 ?</text>
+    </g>
+
+    <!-- Phase 3: Alloc & Copy -->
+    <g class="node-g" data-phase="3" data-id="VIRTUALALLOC" data-info="&lt;strong&gt;mw_VirtualAlloc&lt;/strong&gt; — Calls fn_VirtualAlloc(0, SizeOfImage+0x3C00000, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE). Returns mapped_base." onclick="selectNode(this)">
+      <rect x="265" y="924" width="350" height="56" rx="7" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+      <text x="440" y="945" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">mw_VirtualAlloc</text>
+      <text x="440" y="962" text-anchor="middle" font-size="11" fill="#185FA5">fn_VirtualAlloc(0, SizeOfImage+0x3C00000,</text>
+      <text x="440" y="974" text-anchor="middle" font-size="11" fill="#185FA5">MEM_COMMIT|RESERVE, PAGE_READWRITE)</text>
+    </g>
+
+    <g class="node-g" data-phase="3" data-id="COPY_HEADERS" data-info="&lt;strong&gt;mw_CopySections&lt;/strong&gt; — Copies PE headers and each section from source PE to mapped_base. Iterates NumberOfSections." onclick="selectNode(this)">
+      <rect x="290" y="1024" width="300" height="46" rx="7" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+      <text x="440" y="1043" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">mw_CopySections</text>
+      <text x="440" y="1060" text-anchor="middle" font-size="11" fill="#185FA5">copy headers + NumberOfSections sections</text>
+    </g>
+
+    <!-- Phase 4: Relocations -->
+    <g class="node-g" data-phase="4" data-id="CALC_DELTA" data-info="&lt;strong&gt;mw_CalcRelocDelta&lt;/strong&gt; — delta = mapped_base − ImageBase. Used to fix all absolute addresses in relocation table." onclick="selectNode(this)">
+      <rect x="290" y="1114" width="300" height="46" rx="7" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+      <text x="440" y="1133" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">mw_CalcRelocDelta</text>
+      <text x="440" y="1150" text-anchor="middle" font-size="11" fill="#993C1D">delta = mapped_base − ImageBase</text>
+    </g>
+
+    <g class="node-g" data-phase="4" data-id="PROC_RELOC_BLK" data-info="&lt;strong&gt;mw_ProcessRelocBlock&lt;/strong&gt; — Iterates relocation blocks. Checks type bits [15:12]. Dispatches to type handlers." onclick="selectNode(this)">
+      <rect x="265" y="1204" width="350" height="56" rx="7" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+      <text x="440" y="1223" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">mw_ProcessRelocBlock</text>
+      <text x="440" y="1240" text-anchor="middle" font-size="11" fill="#993C1D">iterate reloc blocks, check type [15:12]</text>
+      <text x="440" y="1252" text-anchor="middle" font-size="10" fill="#993C1D">type 1=HIGH  2=LOW  3=HIGHLOW  10=DIR64</text>
+    </g>
+
+    <g class="node-g" data-phase="4" data-id="APPLY_RELOC" data-info="&lt;strong&gt;mw_ApplyReloc&lt;/strong&gt; — Applies delta to each relocation entry. Handles HIGHLOW (add 32-bit delta) and HIGH/LOW (add upper/lower word). Advances to next block." onclick="selectNode(this)">
+      <rect x="290" y="1304" width="300" height="46" rx="7" fill="#FAECE7" stroke="#993C1D" stroke-width="0.8"/>
+      <text x="440" y="1323" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">mw_ApplyReloc</text>
+      <text x="440" y="1340" text-anchor="middle" font-size="11" fill="#993C1D">*target += delta (per type), advance block</text>
+    </g>
+
+    <!-- Phase 5: Imports -->
+    <g class="node-g" data-phase="5" data-id="PARSE_IMPORT" data-info="&lt;strong&gt;mw_ParseImportDir&lt;/strong&gt; — Reads import directory from NT headers offset 0x80. For each IMAGE_IMPORT_DESCRIPTOR, loads DLL via fn_LoadLibraryA." onclick="selectNode(this)">
+      <rect x="265" y="1394" width="350" height="56" rx="7" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.8"/>
+      <text x="440" y="1413" text-anchor="middle" font-size="13" font-weight="500" fill="#27500A">mw_ParseImportDir</text>
+      <text x="440" y="1430" text-anchor="middle" font-size="11" fill="#3B6D11">import descriptor → fn_LoadLibraryA(dll_name)</text>
+      <text x="440" y="1442" text-anchor="middle" font-size="10" fill="#3B6D11">offset 0x80 in NT optional header</text>
+    </g>
+
+    <g class="node-g" data-phase="5" data-id="RESOLVE_IMPORT" data-info="&lt;strong&gt;mw_ResolveImport&lt;/strong&gt; — For each IAT entry, calls fn_GetProcAddress(hDll, func_name). Patches IAT slot with resolved address." onclick="selectNode(this)">
+      <rect x="265" y="1494" width="350" height="56" rx="7" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.8"/>
+      <text x="440" y="1513" text-anchor="middle" font-size="13" font-weight="500" fill="#27500A">mw_ResolveImport</text>
+      <text x="440" y="1530" text-anchor="middle" font-size="11" fill="#3B6D11">fn_GetProcAddress(hDll, func_name) → IAT patch</text>
+      <text x="440" y="1542" text-anchor="middle" font-size="10" fill="#3B6D11">iterate ILT until null terminator entry</text>
+    </g>
+
+    <!-- Phase 6: Entry point -->
+    <g class="node-g" data-phase="6" data-id="VIRT_PROTECT" data-info="&lt;strong&gt;mw_SetPageProtect&lt;/strong&gt; — Calls fn_VirtualProtect(mapped_base, SizeOfImage, PAGE_EXECUTE_READ, &amp;old). Removes write, adds execute." onclick="selectNode(this)">
+      <rect x="265" y="1594" width="350" height="46" rx="7" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.8"/>
+      <text x="440" y="1613" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">mw_SetPageProtect</text>
+      <text x="440" y="1630" text-anchor="middle" font-size="11" fill="#A32D2D">VirtualProtect → PAGE_EXECUTE_READ</text>
+    </g>
+
+    <g class="node-g" data-phase="6" data-id="CALL_ENTRY" data-info="&lt;strong&gt;mw_CallEntryPoint&lt;/strong&gt; — Calls DllMain(mapped_base, DLL_PROCESS_ATTACH, NULL). Or EXE entrypoint. Final state: exits machine." onclick="selectNode(this)">
+      <rect x="265" y="1684" width="350" height="56" rx="7" fill="#FCEBEB" stroke="#A32D2D" stroke-width="1.4"/>
+      <text x="440" y="1703" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">mw_CallEntryPoint</text>
+      <text x="440" y="1720" text-anchor="middle" font-size="11" fill="#A32D2D">DllMain(mapped_base, DLL_PROCESS_ATTACH, 0)</text>
+      <text x="440" y="1732" text-anchor="middle" font-size="10" fill="#A32D2D">return module_list_entry</text>
+    </g>
+
+    <!-- EDGES: main flow -->
+    <line class="edge" data-from="INIT" data-to="WALK_PEB" x1="440" y1="60" x2="440" y2="102" stroke="#7F77DD" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="WALK_PEB" data-to="NEXT_MODULE" x1="440" y1="148" x2="440" y2="192" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="NEXT_MODULE" data-to="PARSE_EXPORTS" x1="440" y1="238" x2="440" y2="282" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="PARSE_EXPORTS" data-to="HASH_NAME" x1="440" y1="328" x2="440" y2="372" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="HASH_NAME" data-to="CMP_HASH" x1="440" y1="418" x2="440" y2="462" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- Hash loop back -->
+    <path class="edge" data-from="HASH_NAME" data-to="HASH_NAME" d="M612 395 Q660 395 660 340 Q660 280 640 260 Q620 240 612 310" fill="none" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="666" y="345" font-size="10" fill="#1D9E75" text-anchor="start">next char</text>
+
+    <!-- miss → next export entry -->
+    <path class="edge" data-from="CMP_HASH" data-to="NEXT_MODULE" d="M245 490 Q110 490 110 215 Q110 192 290 192" fill="none" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="48" y="330" font-size="10" fill="#1D9E75" text-anchor="middle" transform="rotate(-90,48,330)">no match → next export</text>
+
+    <!-- hit → store -->
+    <line class="edge" data-from="CMP_HASH" data-to="STORE_FN" x1="635" y1="490" x2="650" y2="462" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+    <text x="655" y="455" font-size="10" fill="#1D9E75">match!</text>
+
+    <!-- store back to check -->
+    <path class="edge" data-from="STORE_FN" data-to="ALL_FOUND" d="M760 518 Q800 540 760 580 Q720 600 590 587" fill="none" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+    <line class="edge" data-from="CMP_HASH" data-to="ALL_FOUND" x1="440" y1="518" x2="440" y2="564" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="ALL_FOUND" data-to="CHECK_MZ" x1="440" y1="610" x2="440" y2="654" stroke="#BA7517" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- not all found → keep walking -->
+    <path class="edge" data-from="ALL_FOUND" data-to="NEXT_MODULE" d="M290 587 Q200 587 200 215 Q200 192 290 192" fill="none" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="170" y="400" font-size="10" fill="#1D9E75" text-anchor="middle" transform="rotate(-90,170,400)">not all resolved</text>
+
+    <line class="edge" data-from="CHECK_MZ" data-to="CHECK_LFANEW" x1="440" y1="700" x2="440" y2="744" stroke="#BA7517" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- bad MZ → retry scan forward -->
+    <path class="edge" d="M590 677 Q720 677 720 630 Q720 590 720 564 Q720 540 640 587" fill="none" stroke="#BA7517" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="726" y="630" font-size="10" fill="#BA7517" text-anchor="start">bad MZ −− scan++</text>
+
+    <line class="edge" data-from="CHECK_LFANEW" data-to="CHECK_PE" x1="440" y1="790" x2="440" y2="834" stroke="#BA7517" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="CHECK_PE" data-to="VIRTUALALLOC" x1="440" y1="880" x2="440" y2="924" stroke="#378ADD" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- bad PE sig → retry -->
+    <path class="edge" d="M590 857 Q740 857 740 750 Q740 660 660 677" fill="none" stroke="#BA7517" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="746" y="760" font-size="10" fill="#BA7517" text-anchor="start">bad sig</text>
+
+    <line class="edge" data-from="VIRTUALALLOC" data-to="COPY_HEADERS" x1="440" y1="980" x2="440" y2="1024" stroke="#378ADD" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="COPY_HEADERS" data-to="CALC_DELTA" x1="440" y1="1070" x2="440" y2="1114" stroke="#D85A30" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="CALC_DELTA" data-to="PROC_RELOC_BLK" x1="440" y1="1160" x2="440" y2="1204" stroke="#D85A30" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="PROC_RELOC_BLK" data-to="APPLY_RELOC" x1="440" y1="1260" x2="440" y2="1304" stroke="#D85A30" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- reloc loop back -->
+    <path class="edge" d="M590 1327 Q760 1327 760 1232 Q760 1204 615 1232" fill="none" stroke="#D85A30" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="766" y="1270" font-size="10" fill="#D85A30" text-anchor="start">next block</text>
+
+    <line class="edge" data-from="APPLY_RELOC" data-to="PARSE_IMPORT" x1="440" y1="1350" x2="440" y2="1394" stroke="#639922" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="PARSE_IMPORT" data-to="RESOLVE_IMPORT" x1="440" y1="1450" x2="440" y2="1494" stroke="#639922" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- import loop -->
+    <path class="edge" d="M615 1520 Q790 1520 790 1421 Q790 1394 615 1421" fill="none" stroke="#639922" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+    <text x="796" y="1465" font-size="10" fill="#639922" text-anchor="start">next import</text>
+
+    <line class="edge" data-from="RESOLVE_IMPORT" data-to="VIRT_PROTECT" x1="440" y1="1550" x2="440" y2="1594" stroke="#E24B4A" stroke-width="1.2" marker-end="url(#arr)"/>
+    <line class="edge" data-from="VIRT_PROTECT" data-to="CALL_ENTRY" x1="440" y1="1640" x2="440" y2="1684" stroke="#E24B4A" stroke-width="1.2" marker-end="url(#arr)"/>
+
+    <!-- Phase labels in margin -->
+    <text x="24" y="128" font-size="11" font-weight="500" fill="#7F77DD" transform="rotate(-90,24,128)" text-anchor="middle">INIT</text>
+    <text x="24" y="390" font-size="11" font-weight="500" fill="#1D9E75" transform="rotate(-90,24,390)" text-anchor="middle">PEB / API RESOLVE</text>
+    <text x="24" y="744" font-size="11" font-weight="500" fill="#BA7517" transform="rotate(-90,24,744)" text-anchor="middle">PE VALIDATE</text>
+    <text x="24" y="990" font-size="11" font-weight="500" fill="#378ADD" transform="rotate(-90,24,990)" text-anchor="middle">ALLOC</text>
+    <text x="24" y="1250" font-size="11" font-weight="500" fill="#D85A30" transform="rotate(-90,24,1250)" text-anchor="middle">RELOCATIONS</text>
+    <text x="24" y="1472" font-size="11" font-weight="500" fill="#639922" transform="rotate(-90,24,1472)" text-anchor="middle">IMPORTS</text>
+    <text x="24" y="1660" font-size="11" font-weight="500" fill="#E24B4A" transform="rotate(-90,24,1660)" text-anchor="middle">ENTRY POINT</text>
+
+    <!-- phase separator lines -->
+    <line x1="50" y1="90" x2="830" y2="90" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+    <line x1="50" y1="642" x2="830" y2="642" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+    <line x1="50" y1="912" x2="830" y2="912" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+    <line x1="50" y1="1102" x2="830" y2="1102" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+    <line x1="50" y1="1382" x2="830" y2="1382" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+    <line x1="50" y1="1582" x2="830" y2="1582" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4"/>
+  </svg>
+  <div id="detail">Click any node to see state machine details — address, token values, and what the obfuscated code is actually doing.</div>
+</div>
+<script>
+const PHASE_COLORS = {0:'#7F77DD',1:'#1D9E75',2:'#BA7517',3:'#378ADD',4:'#D85A30',5:'#639922',6:'#E24B4A'};
+let activePhase = 'all';
+let selectedId = null;
+
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activePhase = btn.dataset.phase;
+    applyFilter();
+  });
+});
+
+function applyFilter(){
+  document.querySelectorAll('.node-g').forEach(g=>{
+    const p = g.dataset.phase;
+    const show = activePhase==='all' || p===activePhase;
+    g.classList.toggle('dimmed', !show);
+  });
+  document.querySelectorAll('.edge').forEach(e=>{
+    const from = e.dataset.from, to = e.dataset.to;
+    let show = true;
+    if(activePhase!=='all'){
+      const fromNode = from ? document.querySelector(`.node-g[data-id="${from}"]`) : null;
+      const toNode   = to   ? document.querySelector(`.node-g[data-id="${to}"]`)   : null;
+      const fromP = fromNode ? fromNode.dataset.phase : null;
+      const toP   = toNode   ? toNode.dataset.phase   : null;
+      show = fromP===activePhase || toP===activePhase;
+    }
+    e.classList.toggle('dimmed', !show);
+  });
+}
+
+function selectNode(g){
+  const id = g.dataset.id;
+  if(selectedId===id){ selectedId=null; document.querySelectorAll('.node-g').forEach(n=>n.classList.remove('highlighted')); document.getElementById('detail').innerHTML='Click any node to see details.'; return; }
+  selectedId=id;
+  document.querySelectorAll('.node-g').forEach(n=>n.classList.remove('highlighted'));
+  g.classList.add('highlighted');
+  document.getElementById('detail').innerHTML = g.dataset.info;
+}
+</script>

@@ -6,7 +6,7 @@ permalink: /about/
 
 ## 👋 Hello, I'm Abdullah Islam
 
-I am a **Malware Analyst and Reverse Engineer** with a strong focus on **Windows internals, low-level programming, and offensive security research**.  
+I am a **Malware Analyst and Reverse Engineer** with a strong focus on **Windows internals, low-level programming, and malware research**.  
 I enjoy dissecting complex binaries, understanding how malware operates under the hood, and breaking down obfuscation and anti-analysis techniques.
 
 My work revolves around **learning by practice** — reversing real-world samples, writing tooling to automate analysis, and continuously improving my understanding of how software behaves at the lowest levels.
@@ -20,7 +20,7 @@ My work revolves around **learning by practice** — reversing real-world sample
 - Windows Internals
 - Unpacking & Deobfuscation
 - Binary Exploitation
-- CTF Challenges (RE / PWN)
+- CTF Challenges (RE)
 
 ---
 

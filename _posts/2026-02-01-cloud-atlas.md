@@ -12,7 +12,7 @@ tags: [malware-analysis,reverse-engineering,APT,Cloud Atlas,Red October]
 
 ---
 ## Cloud Atlas - Red October
-Cloud Atlas Red October, First publicly exposed in 2013 by Kaspersky, this operation demonstrated a high level of technical craftsmanship, modular architecture, and meticulous operational discipline, targeting diplomatic, governmental, and research institutions across multiple countries.
+Cloud Atlas Red October, First publicly exposed in 2013 by **Kaspersky**, this operation demonstrated a high level of technical craftsmanship, modular architecture, and meticulous operational discipline, targeting diplomatic, governmental, and research institutions across multiple countries.
 
 The main objective of the attackers was to gather intelligence from the compromised organizations, which included computer systems.
 
@@ -47,7 +47,7 @@ The next step I will disassemble the bytes there making sure to have valid opcod
 ![](/assets/cloud-atlas/shellcode_start.png)
 *Shellcode start*
 
-Here we have the start of the **shellcode** and **PIC** instructions as well and it seems to be decrypted!
+Here we have the start of the **shellcode** and **PIC** instructions as well and it seems to be encrypted!
 
 ### Shellcode analysis 
 
@@ -56,7 +56,7 @@ So after we find our **shellcode** we need to debug it and decrypt it to discove
 ![](/assets/cloud-atlas/hashes_to_resolve.PNG)
 *Shellcode after decrypting the layer of encryption*
 
-After decryption we have function call `sub_407BD3` and some decrypted data after it , after we have entered the function it accessing `PEB` then loaded modules to get the `kernel32.dll` , and then passed to function with pointer to decrypted data under `sub_407BD3` which seems to **hashes** and it will be resolved to do **shellcode functionality**.
+After decryption we have function call `sub_407BD3` and some encrypted data after it , after we have entered the function it accessing `PEB` then loaded modules to get the `kernel32.dll` , and then passed to function with pointer to decrypted data under `sub_407BD3` which seems to **hashes** and it will be resolved to do **shellcode functionality**.
 
 ![](/assets/cloud-atlas/loading_PEB_resolve_hashs.png)
 *Loading kernel32.dll and resolve hashes*
