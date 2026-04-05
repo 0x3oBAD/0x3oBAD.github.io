@@ -329,6 +329,29 @@ Password: [snip]
 Your ID to verify: [snip]
 ```
 ---
+## MITRE ATT&CK Coverage
+
+| ID | Technique | Description |
+|----|----------|-------------|
+| T1622 | Debugger Evasion | TracerPid check + self-deletion |
+| T1027 | Obfuscated Files/Info | RC4 string obfuscation |
+| T1036.005 | Process Masquerading | prctl thread name spoofing |
+| T1070.004 | File Deletion | Self-deletes binary on detection |
+| T1082 | System Info Discovery | CPUID, sysconf |
+| T1083 | File and Directory Discovery | opendir / readdir64 |
+| T1486 | Data Encrypted for Impact | ChaCha20 |
+| T1490 | Inhibit System Recovery | Targets VMDK / datastore images |
+| T1059.004 | Unix Shell Execution | vim-cmd via system() |
+
+---
+## IOCs
+
+- Files bearing `.xx0001` extension on ESXi datastores
+- 56-byte footer containing hex magic `70 61 79 6C 6F 61 64 00` 
+- Processes named FBIthread-pool-0, FBIthread-pool-1, ... visible in ps/top
+- Ransom note present at `/usr/lib/vmware/hostd/docroot/ui/welcome.txt`
+
+---
 ## YARA Rule 
 ```
 rule payload_ransomware
