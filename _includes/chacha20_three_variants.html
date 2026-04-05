@@ -1,0 +1,145 @@
+
+<style>
+:root{
+  --bg:transparent;
+  --c-text:#3d3d3a;
+  --c-muted:#5f5e5a;
+  --c-arrow:#73726c;
+  --c-div:rgba(31,30,29,.15);
+
+  --s-bg:#f1efe8;--s-br:#5f5e5a;--s-ti:#444441;--s-su:#5f5e5a;
+  --g-bg:#e1f5ee;--g-br:#0f6e56;--g-ti:#085041;--g-su:#0f6e56;
+  --p-bg:#eeedfe;--p-br:#534ab7;--p-ti:#3c3489;--p-su:#534ab7;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --c-text:#b9b7af;--c-muted:#888780;--c-arrow:#888780;--c-div:rgba(255,255,255,.12);
+    --s-bg:#2c2c2a;--s-br:#888780;--s-ti:#d3d1c7;--s-su:#888780;
+    --g-bg:#04342c;--g-br:#1d9e75;--g-ti:#9fe1cb;--g-su:#1d9e75;
+    --p-bg:#26215c;--p-br:#7f77dd;--p-ti:#cecbf6;--p-su:#7f77dd;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:ui-monospace,monospace;background:var(--bg)}
+.wrap{width:100%;padding:8px 0}
+svg{width:100%;display:block}
+</style>
+<div class="wrap">
+<svg viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="var(--c-arrow)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- top label -->
+<text x="340" y="26" text-anchor="middle" font-size="11" fill="var(--c-text)">same inputs: ctx (key+nonce+counter), plaintext ptr, ciphertext ptr, length</text>
+
+<!-- dividers -->
+<line x1="235" y1="40" x2="235" y2="478" stroke="var(--c-div)" stroke-width="0.75" stroke-dasharray="4 4"/>
+<line x1="448" y1="40" x2="448" y2="478" stroke="var(--c-div)" stroke-width="0.75" stroke-dasharray="4 4"/>
+
+<!-- ═══ SCALAR ═══ -->
+<rect x="40" y="40" width="180" height="42" rx="6" fill="var(--s-bg)" stroke="var(--s-br)" stroke-width="0.75"/>
+<text x="130" y="65" text-anchor="middle" font-size="13" font-weight="500" fill="var(--s-ti)">mw_chacha20_scalar</text>
+
+<text x="130" y="96"  text-anchor="middle" font-size="11" fill="var(--c-text)">1 block / iteration</text>
+<text x="130" y="110" text-anchor="middle" font-size="11" fill="var(--c-text)">64 bytes keystream</text>
+
+<line x1="130" y1="82" x2="130" y2="130" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="50" y="130" width="160" height="52" rx="6" fill="var(--s-bg)" stroke="var(--s-br)" stroke-width="0.75"/>
+<text x="130" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="var(--s-ti)">16 × 32-bit integers</text>
+<text x="130" y="170" text-anchor="middle" font-size="11" fill="var(--s-su)">GPR only — no SIMD</text>
+
+<line x1="130" y1="182" x2="130" y2="212" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="50" y="212" width="160" height="52" rx="6" fill="var(--s-bg)" stroke="var(--s-br)" stroke-width="0.75"/>
+<text x="130" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="var(--s-ti)">20 rounds (10 double)</text>
+<text x="130" y="252" text-anchor="middle" font-size="11" fill="var(--s-su)">ADD + XOR + ROL32</text>
+
+<line x1="130" y1="264" x2="130" y2="294" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="50" y="294" width="160" height="52" rx="6" fill="var(--s-bg)" stroke="var(--s-br)" stroke-width="0.75"/>
+<text x="130" y="316" text-anchor="middle" font-size="12" font-weight="500" fill="var(--s-ti)">add initial state</text>
+<text x="130" y="334" text-anchor="middle" font-size="11" fill="var(--s-su)">XOR 64 bytes, 4 B at a time</text>
+
+<line x1="130" y1="346" x2="130" y2="376" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="50" y="376" width="160" height="40" rx="6" fill="var(--s-bg)" stroke="var(--s-br)" stroke-width="0.75"/>
+<text x="130" y="400" text-anchor="middle" font-size="12" font-weight="500" fill="var(--s-ti)">counter++ → repeat</text>
+
+<text x="130" y="432" text-anchor="middle" font-size="11" fill="var(--c-muted)">throughput: 1×</text>
+<text x="130" y="447" text-anchor="middle" font-size="11" fill="var(--c-muted)">any x86-64 CPU</text>
+
+<!-- ═══ SSE2 ═══ -->
+<rect x="250" y="40" width="180" height="42" rx="6" fill="var(--g-bg)" stroke="var(--g-br)" stroke-width="0.75"/>
+<text x="340" y="65" text-anchor="middle" font-size="13" font-weight="500" fill="var(--g-ti)">mw_chacha20_sse2</text>
+
+<text x="340" y="96"  text-anchor="middle" font-size="11" fill="var(--c-text)">4 blocks / iteration</text>
+<text x="340" y="110" text-anchor="middle" font-size="11" fill="var(--c-text)">256 bytes keystream</text>
+
+<line x1="340" y1="82" x2="340" y2="130" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="260" y="130" width="160" height="52" rx="6" fill="var(--g-bg)" stroke="var(--g-br)" stroke-width="0.75"/>
+<text x="340" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="var(--g-ti)">XMM regs (128-bit)</text>
+<text x="340" y="170" text-anchor="middle" font-size="11" fill="var(--g-su)">4 × 32-bit lanes each</text>
+
+<line x1="340" y1="182" x2="340" y2="212" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="260" y="212" width="160" height="52" rx="6" fill="var(--g-bg)" stroke="var(--g-br)" stroke-width="0.75"/>
+<text x="340" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="var(--g-ti)">20 rounds (10 double)</text>
+<text x="340" y="252" text-anchor="middle" font-size="11" fill="var(--g-su)">VPADDD + VPXOR + shift|OR</text>
+
+<line x1="340" y1="264" x2="340" y2="294" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="260" y="294" width="160" height="52" rx="6" fill="var(--g-bg)" stroke="var(--g-br)" stroke-width="0.75"/>
+<text x="340" y="316" text-anchor="middle" font-size="12" font-weight="500" fill="var(--g-ti)">add + XOR</text>
+<text x="340" y="334" text-anchor="middle" font-size="11" fill="var(--g-su)">4 blocks simultaneously</text>
+
+<line x1="340" y1="346" x2="340" y2="376" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="260" y="376" width="160" height="40" rx="6" fill="var(--g-bg)" stroke="var(--g-br)" stroke-width="0.75"/>
+<text x="340" y="400" text-anchor="middle" font-size="12" font-weight="500" fill="var(--g-ti)">counter += 4 → repeat</text>
+
+<text x="340" y="432" text-anchor="middle" font-size="11" fill="var(--c-muted)">throughput: ~4×</text>
+<text x="340" y="447" text-anchor="middle" font-size="11" fill="var(--c-muted)">requires SSE2 (bit 0)</text>
+
+<!-- ═══ AVX2 ═══ -->
+<rect x="460" y="40" width="180" height="42" rx="6" fill="var(--p-bg)" stroke="var(--p-br)" stroke-width="0.75"/>
+<text x="550" y="65" text-anchor="middle" font-size="13" font-weight="500" fill="var(--p-ti)">mw_chacha20_avx2</text>
+
+<text x="550" y="96"  text-anchor="middle" font-size="11" fill="var(--c-text)">8 blocks / iteration</text>
+<text x="550" y="110" text-anchor="middle" font-size="11" fill="var(--c-text)">512 bytes keystream</text>
+
+<line x1="550" y1="82" x2="550" y2="130" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="470" y="130" width="160" height="52" rx="6" fill="var(--p-bg)" stroke="var(--p-br)" stroke-width="0.75"/>
+<text x="550" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="var(--p-ti)">YMM regs (256-bit)</text>
+<text x="550" y="170" text-anchor="middle" font-size="11" fill="var(--p-su)">8 × 32-bit lanes each</text>
+
+<line x1="550" y1="182" x2="550" y2="212" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="470" y="212" width="160" height="52" rx="6" fill="var(--p-bg)" stroke="var(--p-br)" stroke-width="0.75"/>
+<text x="550" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="var(--p-ti)">20 rounds (10 double)</text>
+<text x="550" y="252" text-anchor="middle" font-size="11" fill="var(--p-su)">VPADDD + VPXOR + VPSHUFB</text>
+
+<line x1="550" y1="264" x2="550" y2="294" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="470" y="294" width="160" height="52" rx="6" fill="var(--p-bg)" stroke="var(--p-br)" stroke-width="0.75"/>
+<text x="550" y="316" text-anchor="middle" font-size="12" font-weight="500" fill="var(--p-ti)">add + XOR</text>
+<text x="550" y="334" text-anchor="middle" font-size="11" fill="var(--p-su)">8 blocks simultaneously</text>
+
+<line x1="550" y1="346" x2="550" y2="376" stroke="var(--c-arrow)" stroke-width="1.5" marker-end="url(#ar)"/>
+
+<rect x="470" y="376" width="160" height="40" rx="6" fill="var(--p-bg)" stroke="var(--p-br)" stroke-width="0.75"/>
+<text x="550" y="400" text-anchor="middle" font-size="12" font-weight="500" fill="var(--p-ti)">counter += 8 → repeat</text>
+
+<text x="550" y="432" text-anchor="middle" font-size="11" fill="var(--c-muted)">throughput: ~8×</text>
+<text x="550" y="447" text-anchor="middle" font-size="11" fill="var(--c-muted)">requires AVX2 (bit 2)</text>
+
+<!-- bottom notes -->
+<text x="340" y="496" text-anchor="middle" font-size="10.5" fill="var(--c-muted)">all three compute identically — only parallelism differs</text>
+<text x="340" y="512" text-anchor="middle" font-size="10.5" fill="var(--c-muted)">sub-block remainder handled by mw_chacha20_avx2_partial_block_xor</text>
+</svg>
+</div>

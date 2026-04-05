@@ -1,0 +1,297 @@
+<svg width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <style>
+    :root {
+      /* Light theme defaults */
+      --bg:               transparent;
+      --text-primary:     #3d3d3a;
+      --text-heading:     #444441;
+      --text-muted:       #5f5e5a;
+      --border-divider:   rgba(31,30,29,0.18);
+      --arrow-stroke:     #73726c;
+
+      /* Scalar column — warm sand */
+      --sc-box-fill:      #f1efe8;
+      --sc-box-stroke:    #5f5e5a;
+      --sc-text-heading:  #444441;
+      --sc-text-sub:      #5f5e5a;
+
+      /* SSE2 column — green */
+      --ss-box-fill:      #e1f5ee;
+      --ss-box-stroke:    #0f6e56;
+      --ss-text-heading:  #085041;
+      --ss-text-sub:      #0f6e56;
+
+      /* AVX2 column — indigo */
+      --av-box-fill:      #eeedfe;
+      --av-box-stroke:    #534ab7;
+      --av-text-heading:  #3c3489;
+      --av-text-sub:      #534ab7;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:               transparent;
+        --text-primary:     #c9c8c3;
+        --text-heading:     #dddcd7;
+        --text-muted:       #9b9a95;
+        --border-divider:   rgba(200,198,190,0.18);
+        --arrow-stroke:     #8a8980;
+
+        /* Scalar — dark warm */
+        --sc-box-fill:      #2a2925;
+        --sc-box-stroke:    #8a8880;
+        --sc-text-heading:  #d8d7d0;
+        --sc-text-sub:      #a09f98;
+
+        /* SSE2 — dark green */
+        --ss-box-fill:      #0d2a22;
+        --ss-box-stroke:    #2db88a;
+        --ss-text-heading:  #5de8b8;
+        --ss-text-sub:      #2db88a;
+
+        /* AVX2 — dark indigo */
+        --av-box-fill:      #1a1838;
+        --av-box-stroke:    #8b84e8;
+        --av-text-heading:  #b0aaff;
+        --av-text-sub:      #8b84e8;
+      }
+    }
+
+    text { font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .label-top  { font-size:12px; fill:var(--text-primary); }
+    .label-note { font-size:12px; fill:var(--text-muted); }
+    .bottom-note{ font-size:12px; fill:var(--text-muted); }
+    .arrow-line { fill:none; stroke:var(--arrow-stroke); stroke-width:1.5; }
+    .divider    { fill:none; stroke:var(--border-divider); stroke-width:0.5; stroke-dasharray:4 4; }
+
+    /* Scalar */
+    .sc-box  { fill:var(--sc-box-fill);  stroke:var(--sc-box-stroke);  stroke-width:0.5; }
+    .sc-h    { font-size:14px; font-weight:600; fill:var(--sc-text-heading); text-anchor:middle; dominant-baseline:central; }
+    .sc-s    { font-size:12px; fill:var(--sc-text-sub); text-anchor:middle; dominant-baseline:central; }
+
+    /* SSE2 */
+    .ss-box  { fill:var(--ss-box-fill);  stroke:var(--ss-box-stroke);  stroke-width:0.5; }
+    .ss-h    { font-size:14px; font-weight:600; fill:var(--ss-text-heading); text-anchor:middle; dominant-baseline:central; }
+    .ss-s    { font-size:12px; fill:var(--ss-text-sub); text-anchor:middle; dominant-baseline:central; }
+
+    /* AVX2 */
+    .av-box  { fill:var(--av-box-fill);  stroke:var(--av-box-stroke);  stroke-width:0.5; }
+    .av-h    { font-size:14px; font-weight:600; fill:var(--av-text-heading); text-anchor:middle; dominant-baseline:central; }
+    .av-s    { font-size:12px; fill:var(--av-text-sub); text-anchor:middle; dominant-baseline:central; }
+  </style>
+
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+          markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="var(--arrow-stroke)"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+
+  <mask id="text-gap-mask" maskUnits="userSpaceOnUse">
+    <rect x="0" y="0" width="680" height="560" fill="white"/>
+    <!-- Scalar column text gaps -->
+    <rect x="54"  y="95"  width="153" height="17" fill="black" rx="2"/>
+    <rect x="54"  y="109" width="153" height="17" fill="black" rx="2"/>
+    <rect x="54"  y="153" width="153" height="17" fill="black" rx="2"/>
+    <rect x="54"  y="167" width="153" height="17" fill="black" rx="2"/>
+    <rect x="54"  y="237" width="153" height="17" fill="black" rx="2"/>
+    <rect x="54"  y="251" width="153" height="17" fill="black" rx="2"/>
+    <!-- SSE2 column text gaps -->
+    <rect x="264" y="95"  width="153" height="17" fill="black" rx="2"/>
+    <rect x="264" y="109" width="153" height="17" fill="black" rx="2"/>
+    <rect x="264" y="153" width="153" height="17" fill="black" rx="2"/>
+    <rect x="264" y="167" width="153" height="17" fill="black" rx="2"/>
+    <rect x="264" y="237" width="153" height="17" fill="black" rx="2"/>
+    <rect x="264" y="251" width="153" height="17" fill="black" rx="2"/>
+    <!-- AVX2 column text gaps -->
+    <rect x="474" y="95"  width="153" height="17" fill="black" rx="2"/>
+    <rect x="474" y="109" width="153" height="17" fill="black" rx="2"/>
+    <rect x="474" y="153" width="153" height="17" fill="black" rx="2"/>
+    <rect x="474" y="167" width="153" height="17" fill="black" rx="2"/>
+    <rect x="474" y="237" width="153" height="17" fill="black" rx="2"/>
+    <rect x="474" y="251" width="153" height="17" fill="black" rx="2"/>
+    <!-- Top label -->
+    <rect x="126" y="14"  width="428" height="17" fill="black" rx="2"/>
+    <!-- Bottom notes -->
+    <rect x="56"  y="496" width="568" height="17" fill="black" rx="2"/>
+    <rect x="56"  y="514" width="568" height="17" fill="black" rx="2"/>
+  </mask>
+</defs>
+
+<!-- ═══ Shared top label ═══ -->
+<text x="340" y="28" text-anchor="middle" class="label-top">
+  same inputs: ctx (key+nonce+counter), plaintext ptr, ciphertext ptr, length
+</text>
+
+<!-- ══════════════════════════════════════════════
+     SCALAR column  (x-center = 130)
+═══════════════════════════════════════════════ -->
+
+<!-- Header box -->
+<rect x="40" y="44" width="180" height="44" rx="8" class="sc-box"/>
+<text x="130" y="66" class="sc-h">mw_chacha20_scalar</text>
+
+<!-- Sub-labels below header -->
+<text x="130" y="104" text-anchor="middle" class="label-note">1 block per iteration</text>
+<text x="130" y="118" text-anchor="middle" class="label-note">64 bytes of keystream</text>
+
+<!-- Arrow: header → state box -->
+<line x1="130" y1="88" x2="130" y2="136"
+      marker-end="url(#arrow)" class="arrow-line"
+      mask="url(#text-gap-mask)"/>
+
+<!-- State box -->
+<rect x="50" y="136" width="160" height="56" rx="8" class="sc-box"/>
+<text x="130" y="158" class="sc-h">16 × 32-bit integers</text>
+<text x="130" y="176" class="sc-s">in CPU registers</text>
+
+<!-- Arrow: state → rounds -->
+<line x1="130" y1="192" x2="130" y2="220"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Rounds box -->
+<rect x="50" y="220" width="160" height="56" rx="8" class="sc-box"/>
+<text x="130" y="242" class="sc-h">20 rounds (10 double)</text>
+<text x="130" y="260" class="sc-s">ADD + XOR + ROL32</text>
+
+<!-- Arrow: rounds → add+xor -->
+<line x1="130" y1="276" x2="130" y2="304"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Add+XOR box -->
+<rect x="50" y="304" width="160" height="56" rx="8" class="sc-box"/>
+<text x="130" y="326" class="sc-h">Add initial state</text>
+<text x="130" y="344" class="sc-s">XOR 64 bytes plaintext</text>
+
+<!-- Arrow: add+xor → counter -->
+<line x1="130" y1="360" x2="130" y2="388"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Counter box -->
+<rect x="50" y="388" width="160" height="44" rx="8" class="sc-box"/>
+<text x="130" y="410" class="sc-h">counter++ → repeat</text>
+
+<!-- Footer notes -->
+<text x="130" y="452" text-anchor="middle" class="label-note">throughput: 1×</text>
+<text x="130" y="466" text-anchor="middle" class="label-note">any x86-64 CPU</text>
+
+
+<!-- ══════════════════════════════════════════════
+     SSE2 column  (x-center = 340)
+═══════════════════════════════════════════════ -->
+
+<!-- Header box -->
+<rect x="250" y="44" width="180" height="44" rx="8" class="ss-box"/>
+<text x="340" y="66" class="ss-h">mw_chacha20_sse2</text>
+
+<!-- Sub-labels -->
+<text x="340" y="104" text-anchor="middle" class="label-note">4 blocks per iteration</text>
+<text x="340" y="118" text-anchor="middle" class="label-note">256 bytes of keystream</text>
+
+<!-- Arrow: header → state -->
+<line x1="340" y1="88" x2="340" y2="136"
+      marker-end="url(#arrow)" class="arrow-line"
+      mask="url(#text-gap-mask)"/>
+
+<!-- State box -->
+<rect x="260" y="136" width="160" height="56" rx="8" class="ss-box"/>
+<text x="340" y="158" class="ss-h">XMM registers (128-bit)</text>
+<text x="340" y="176" class="ss-s">4 × 32-bit lanes each</text>
+
+<!-- Arrow: state → rounds -->
+<line x1="340" y1="192" x2="340" y2="220"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Rounds box -->
+<rect x="260" y="220" width="160" height="56" rx="8" class="ss-box"/>
+<text x="340" y="242" class="ss-h">Same 20 rounds</text>
+<text x="340" y="260" class="ss-s">PADDD + PXOR + PSRLD</text>
+
+<!-- Arrow: rounds → add+xor -->
+<line x1="340" y1="276" x2="340" y2="304"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Add+XOR box -->
+<rect x="260" y="304" width="160" height="56" rx="8" class="ss-box"/>
+<text x="340" y="326" class="ss-h">Add + XOR</text>
+<text x="340" y="344" class="ss-s">4 blocks simultaneously</text>
+
+<!-- Arrow: add+xor → counter -->
+<line x1="340" y1="360" x2="340" y2="388"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Counter box -->
+<rect x="260" y="388" width="160" height="44" rx="8" class="ss-box"/>
+<text x="340" y="410" class="ss-h">counter += 4 → repeat</text>
+
+<!-- Footer notes -->
+<text x="340" y="452" text-anchor="middle" class="label-note">throughput: ~4×</text>
+<text x="340" y="466" text-anchor="middle" class="label-note">requires SSE2 (bit 0)</text>
+
+
+<!-- ══════════════════════════════════════════════
+     AVX2 column  (x-center = 550)
+═══════════════════════════════════════════════ -->
+
+<!-- Header box -->
+<rect x="460" y="44" width="180" height="44" rx="8" class="av-box"/>
+<text x="550" y="66" class="av-h">mw_chacha20_avx2</text>
+
+<!-- Sub-labels -->
+<text x="550" y="104" text-anchor="middle" class="label-note">8 blocks per iteration</text>
+<text x="550" y="118" text-anchor="middle" class="label-note">512 bytes of keystream</text>
+
+<!-- Arrow: header → state -->
+<line x1="550" y1="88" x2="550" y2="136"
+      marker-end="url(#arrow)" class="arrow-line"
+      mask="url(#text-gap-mask)"/>
+
+<!-- State box -->
+<rect x="470" y="136" width="160" height="56" rx="8" class="av-box"/>
+<text x="550" y="158" class="av-h">YMM registers (256-bit)</text>
+<text x="550" y="176" class="av-s">8 × 32-bit lanes each</text>
+
+<!-- Arrow: state → rounds -->
+<line x1="550" y1="192" x2="550" y2="220"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Rounds box -->
+<rect x="470" y="220" width="160" height="56" rx="8" class="av-box"/>
+<text x="550" y="242" class="av-h">Same 20 rounds</text>
+<text x="550" y="260" class="av-s">VPADDD + VPXOR + VPSRLD</text>
+
+<!-- Arrow: rounds → add+xor -->
+<line x1="550" y1="276" x2="550" y2="304"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Add+XOR box -->
+<rect x="470" y="304" width="160" height="56" rx="8" class="av-box"/>
+<text x="550" y="326" class="av-h">Add + XOR</text>
+<text x="550" y="344" class="av-s">8 blocks simultaneously</text>
+
+<!-- Arrow: add+xor → counter -->
+<line x1="550" y1="360" x2="550" y2="388"
+      marker-end="url(#arrow)" class="arrow-line"/>
+
+<!-- Counter box -->
+<rect x="470" y="388" width="160" height="44" rx="8" class="av-box"/>
+<text x="550" y="410" class="av-h">counter += 8 → repeat</text>
+
+<!-- Footer notes -->
+<text x="550" y="452" text-anchor="middle" class="label-note">throughput: ~8×</text>
+<text x="550" y="466" text-anchor="middle" class="label-note">requires AVX2 (bit 2)</text>
+
+
+<!-- ═══ Column dividers ═══ -->
+<line x1="235" y1="44" x2="235" y2="480" class="divider"/>
+<line x1="448" y1="44" x2="448" y2="480" class="divider"/>
+
+<!-- ═══ Bottom notes ═══ -->
+<text x="340" y="510" text-anchor="middle" class="bottom-note">
+  all three functions are identical in what they compute — only how many blocks run in parallel differs
+</text>
+<text x="340" y="528" text-anchor="middle" class="bottom-note">
+  partial final block (remainder bytes) handled separately in mw_chacha20_avx2_partial_block_xor
+</text>
+
+</svg>
