@@ -357,83 +357,105 @@ Your ID to verify: [snip]
 rule payload_ransomware
 {
     meta:
-        description      = "Payload Ransomware "
+        description      = "Payload ESXi Ransomware"
         author           = "Abdullah Islam @0x3oBAD"
-        date             = "2026-04-05"
+        date             = "2026-04-07"
         md5              = "f91cbdd91e2daab31b715ce3501f5ea0"
         sha256           = "bed8d1752a12e5681412efbb8283910857f7c5c431c2d73f9bbc5b379047a316"
-        malware_family   = "ESXi Ransomware Locker"
+        malware_family   = "Payload Ransomware"
         target_platform  = "Linux / VMware ESXi"
+        detection_phases = "pre-install dropper, execution, lateral-movement artifact"
 
     strings:
-        $pubkey_1        = "TnJqU2F5RFFYREpPTURkUGx5Q3NMem0yNlZKM0s1aks=" ascii
-        $pubkey_2        = "Pmep+UUmeFwxxUO+P03HA558P3ZPZWN8bCK4XzNXtXU=" ascii
-        $pubkey_head     = "W2M6q8YwDKCcSvBj7YRjVNtSI/PO22G+" ascii
+        $curve25519_clamp = { C0 ?? F8 ?? ?? ?? ?? 40 }
+        $chacha20_const   = "expand 32-byte k" ascii
 
-        $ext             = ".xx0001" ascii nocase
-        $thread_name     = "FBIthread-pool-%d" ascii
+        $proc_status      = "/proc/self/status" ascii
+        $tracer_field     = "TracerPid:" ascii
+        $proc_exe         = "/proc/self/exe" ascii
 
-        $thpool_1        = "thpool_init(): Could not allocate memory for thread pool" ascii
-        $thpool_2        = "thpool_init(): Could not allocate memory for threads" ascii
-        $thpool_3        = "thpool_init(): Could not allocate memory for job queue" ascii
-        $thpool_4        = "thpool_add_work(): Could not allocate memory for new job" ascii
-        $thpool_5        = "thread_do(): cannot handle SIGUSR1" ascii
-        $thpool_6        = "bsem_init(): Binary semaphore can take only values 1 or 0" ascii
+        $esxi_note        = "/usr/lib/vmware/hostd/docroot/ui/welcome.txt" ascii
+        $urandom          = "/dev/urandom" ascii
 
-        $vim_cmd         = "vim-cmd vmsvc/power.off %d > /dev/null 2>&1" ascii
-        $esxi_inventory  = "/etc/vmware/hostd/vmInventory.xml" ascii
-        $esxi_note       = "/usr/lib/vmware/hostd/docroot/ui/welcome.txt" ascii
-        $xpath_query     = "//ConfigEntry" ascii
-        $vmx_field       = "vmxCfgPath" ascii
+        $vim_cmd          = "vim-cmd vmsvc/power.off %d > /dev/null 2>&1" ascii
+        $esxi_inventory   = "/etc/vmware/hostd/vmInventory.xml" ascii
+        $xpath_query      = "//ConfigEntry" ascii
+        $vmx_field        = "vmxCfgPath" ascii
 
-        $proc_status     = "/proc/self/status" ascii
-        $tracer_field    = "TracerPid:" ascii
-        $proc_exe        = "/proc/self/exe" ascii
+        $ext              = ".xx0001" ascii nocase
+        $footer_magic     = { 70 61 79 6C 6F 61 64 00 }
 
-        $key_err_1       = "[!] invalid key size" ascii
-        $key_err_2       = "[!] base64 pubkey decode failed" ascii
+        $thread_name      = "FBIthread-pool-%d" ascii
+        $thpool_init_oom  = "thpool_init(): Could not allocate memory for thread pool" ascii
+        $thpool_job_oom   = "thpool_add_work(): Could not allocate memory for new job" ascii
+        $thpool_sigusr    = "thread_do(): cannot handle SIGUSR1" ascii
+        $bsem_err         = "bsem_init(): Binary semaphore can take only values 1 or 0" ascii
 
-        $libxml2         = "libxml2.so.2" ascii
-        $urandom         = "/dev/urandom" ascii
-        $b64_alpha       = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" ascii
+        $pubkey_1         = "TnJqU2F5RFFYREpPTURkUGx5Q3NMem0yNlZKM0s1aks=" ascii
+        $pubkey_2         = "Pmep+UUmeFwxxUO+P03HA558P3ZPZWN8bCK4XzNXtXU=" ascii
+        $pubkey_head      = "W2M6q8YwDKCcSvBj7YRjVNtSI/PO22G+" ascii
 
-        $footer_magic    = { 70 61 79 6C 6F 61 64 00 }
+        $key_err_1        = "[!] invalid key size" ascii
+        $key_err_2        = "[!] base64 pubkey decode failed" ascii
+
+        $libxml2          = "libxml2.so.2" ascii
+        $b64_alpha        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" ascii
+
+        $segment_loop_5   = { B? 05 00 00 00 [0-16] 3? 05 }
+        $flock_lockex     = { B? 02 00 00 00 [0-8] E8 ?? ?? ?? ?? }
 
     condition:
-        (
-            uint32(0) == 0x464C457F
-            and uint8(4) == 2
-            and uint8(5) == 1
-            and uint16(0x12) == 0x3E
-            and (
-                (
-                    filesize == 39904
-                    and all of ($pubkey_1, $pubkey_2, $pubkey_head)
+        uint32(0) == 0x464C457F
+        and uint8(4)  == 2
+        and uint8(5)  == 1
+        and uint16(0x12) == 0x3E
+
+        and (
+            (
+                filesize == 39904
+                and all of ($pubkey_1, $pubkey_2, $pubkey_head)
+            )
+            or (
+                $proc_status
+                and $tracer_field
+                and $proc_exe
+                and (
+                    any of ($pubkey_1, $pubkey_2, $pubkey_head)
+                    or ($key_err_1 and $key_err_2)
                 )
-                or
-                (
-                    $vim_cmd
-                    and $esxi_inventory
-                    and (
-                        #ext + #thread_name + #thpool_1 + #thpool_2 +
-                        #thpool_3 + #thpool_4 + #thpool_5 + #thpool_6 +
-                        #vmx_field + #xpath_query + #esxi_note +
-                        #key_err_1 + #key_err_2 + #proc_exe +
-                        #urandom + #libxml2 >= 6
-                    )
+                and 1 of ($chacha20_const, $curve25519_clamp, $b64_alpha)
+            )
+            or (
+                $vim_cmd
+                and $esxi_inventory
+                and $xpath_query
+                and (
+                    $esxi_note
+                    or ($thpool_init_oom and $thread_name)
+                    or ($flock_lockex and $ext)
                 )
-                or
-                (
-                    $thpool_1
-                    and $thpool_6
-                    and $vim_cmd
-                    and 3 of ($libxml2, $urandom, $tracer_field, $b64_alpha, $xpath_query)
+                and (
+                    #esxi_note + #vmx_field + #xpath_query + #ext
+                    + #thread_name + #thpool_init_oom + #thpool_job_oom
+                    + #thpool_sigusr + #bsem_err + #key_err_1
+                    + #key_err_2 + #proc_exe + #urandom + #libxml2 >= 5
                 )
             )
-        )
-        or
-        (
-            $footer_magic at (filesize - 56 + 24)
+            or (
+                $chacha20_const
+                and $curve25519_clamp
+                and $urandom
+                and 2 of ($vim_cmd, $esxi_inventory, $thread_name, $xpath_query)
+            )
+            or (
+                $segment_loop_5
+                and $flock_lockex
+                and $footer_magic
+                and 1 of ($esxi_inventory, $vim_cmd, $ext)
+            )
+            or (
+                $footer_magic at (filesize - 56 + 24)
+            )
         )
 }
 ```
