@@ -1,7 +1,7 @@
 ---
 title: "MustangPanda New Backdoor LotusLite"
 description: "Deep Technical Analysis Of LotusLite"
-date: 2026-5-12
+date: 2026-5-13
 permalink: /posts/lotuslite-backdoor-writeup/
 image:
     path: /assets/img/cover.webp
@@ -105,7 +105,7 @@ The C2 hostname itself is not hardcoded in the binary and is supplied at runtime
 
 ---
 ## Key Observation
-Based on (VT triage)[https://www.virustotal.com/gui/ip-address/103.79.77.181/details] of C2 about the `last HTTPS certificate` , The certificate was issued `2026-03-12` and the **Venezuela-themed** campaign started **January 2026** , meaning this cert was provisioned specifically for the campaign infrastructure. The `India/South Korea` campaign `March 2026` timing aligns perfectly with this cert issuance date, suggesting this IP is part of the `LOTUSLITE v1.1` wave targeting **Indian banks** and **Korean diplomats**, not the original **Venezuela campaign**.
+Based on [VT triage](https://www.virustotal.com/gui/ip-address/103.79.77.181/details) of C2 about the `last HTTPS certificate` , The certificate was issued `2026-03-12` and the **Venezuela-themed** campaign started **January 2026** , meaning this cert was provisioned specifically for the campaign infrastructure. The `India/South Korea` campaign `March 2026` timing aligns perfectly with this cert issuance date, suggesting this IP is part of the `LOTUSLITE v1.1` wave targeting **Indian banks** and **Korean diplomats**, not the original **Venezuela campaign**.
 That date correlation alone narrows the infrastructure cluster significantly , any other `MyLocalManager` certs issued in the same `March 2026` window are almost certainly the same operator spinning up parallel C2 nodes.
 
 ---
