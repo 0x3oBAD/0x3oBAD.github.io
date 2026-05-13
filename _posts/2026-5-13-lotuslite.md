@@ -34,24 +34,24 @@ The malware resolves all imports in runtime by decrypting the **function** and *
 1. **XOR decryption** with a rotating 5-byte key `Credt` 
 2. **In-place reversal** of the decrypted result
 ![](/assets/loutislite/string_decryption.png)
-*Figure(1) String Decryption*
+*Figure(2) String Decryption*
 then loading the DLL through `LdrLoadDll` function then import the desired function.
 ![](/assets/loutislite/DLL_loader_funtion.png)
-*Figure(2) DLL loader function*
+*Figure(3) DLL loader function*
 
 ![](/assets/loutislite/API_resolving_scheme.png)
-*Figure(3) API resolving scheme*
+*Figure(4) API resolving scheme*
 
 ---
 ## Evasion
 On startup, the malware inspects its own command-line arguments using a dynamically resolved `CommandLineToArgvW`. It compares each argument against a known allowlist stored as a wide-string buffer. If unexpected arguments are present or if the process was launched without the expected `--DMLA` flag it alters its execution path to `ExitProcess`.
 ![](/assets/loutislite/cmd_sandbox_evasion.png)
-*Figure(4) Sandbox Evasion*
+*Figure(5) Sandbox Evasion*
 
 ---
 ## Command and control
 `LOTUSLITE` communicates exclusively over **HTTPS** on port **443**, using WinINet APIs resolved dynamically at runtime. All traffic is `POST-based`, with the beacon hitting a hardcoded path `/info/faq/v5` on the C2 host.
-To blend in with legitimate traffic, every request carries three spoofed headers:
+To blend in with legitimate traffic, every request carries spoofed headers:
 > Request: /info/faq/v5 HTTPS  
 > Connection: Keep-Alive  
 > Host: learn.microsoft.com  
