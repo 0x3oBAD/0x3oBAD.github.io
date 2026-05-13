@@ -82,7 +82,7 @@ The C2 hostname itself is not hardcoded in the binary and is supplied at runtime
 >C2 : 103[.]79[.]77[.]181
 
 ![](/assets/loutislite/C2_Triage.png)
-*Figure(6) LotusLite C2 VT triage*
+*Figure(7) LotusLite C2 VT triage*
 
 ---
 ## LotusLite Backdoor
