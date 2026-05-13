@@ -6,7 +6,7 @@ permalink: /posts/lotuslite-backdoor-writeup/
 image:
     path: /assets/img/cover.webp
 categories: [Malware Analysis]
-tags: [malware-analysis,reverse-engineering-APT]
+tags: [malware-analysis,reverse-engineering,APT]
 
 ---
 ## LotusLite in nutshell
