@@ -6,7 +6,7 @@ permalink: /posts/payload-ransomware-writeup/
 image:
     path: /assets/img/payload_post.png
 categories: [Malware Analysis]
-tags: [malware-analysis,reverse-engineering,ransomware,payload]
+tags: [malware-analysis,reverse-engineering]
 
 ---
 

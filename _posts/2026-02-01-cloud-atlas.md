@@ -6,7 +6,7 @@ permalink: /posts/cloud-atlas-writeup/
 image:
     path: /assets/img/cloud_atlas.png
 categories: [Malware Analysis]
-tags: [malware-analysis,reverse-engineering,APT,Cloud Atlas,Red October]
+tags: [malware-analysis,reverse-engineering,APT]
 
 ---
 
