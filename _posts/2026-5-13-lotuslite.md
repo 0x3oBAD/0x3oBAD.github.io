@@ -116,7 +116,7 @@ That date correlation alone narrows the infrastructure cluster significantly , a
 | **File System** | Drops files into `C:\ProgramData\WKwpsOffice2\`, including `WKwpsOffice.exe` and a masqueraded DLL `Microsoft.WindowsAppRuntime.Bootstrap.dll`. |
 | **Registry Persistence** | Creates the `AwpOn` Run key under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` to launch `WKwpsOffice.exe --DMLA` at logon. |
 | **Process Behavior** | Spawns a hidden `cmd.exe` process using anonymous pipes for remote shell interaction and executes with the `--DMLA` argument. |
-| **Network Activity** | Uses HTTP-based beaconing with a custom binary protocol identified by magic value `0xB2EBCFDF`, with adaptive polling intervals between `20ms` and `2000ms`. |
+| **Network Activity** | Uses HTTPS-based beaconing with a custom binary protocol identified by magic value `0xB2EBCFDF`, with adaptive polling intervals between `20ms` and `2000ms`. |
 | **Host Discovery** | Initial beacon includes basic victim identification data such as computer name and username. |
 
 ---
